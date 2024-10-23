@@ -8,5 +8,5 @@ matplotlib==3.8.4
 seaborn==0.13.2
 plotly==5.22.0
 requests==2.31.0
-opencv-python==4.10.0.84
+opencv-python-headless==4.10.0.84
 
