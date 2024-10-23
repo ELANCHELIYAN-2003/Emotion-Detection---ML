@@ -6,7 +6,7 @@ from tensorflow.keras.models import load_model
 import matplotlib.pyplot as plt
 
 # Load model for real-time video classification
-model = load_model('E:/SEM-5/LAB/ML Lab/proj/model.h5')
+model = load_model('model.h5')
 
 # Emotion labels
 emotion_dict = {0: "Angry", 1: "Disgust", 2: "Fear", 3: "Happy", 4: "Sad", 5: "Surprise", 6: "Neutral"}
