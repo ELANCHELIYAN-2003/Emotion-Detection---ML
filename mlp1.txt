@@ -1,0 +1,76 @@
+import cv2
+import numpy as np
+from tensorflow.keras.models import load_model
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+# Load your trained model
+model = load_model('E:/SEM-5/LAB/ML Lab/proj/model.h5')
+
+# Define emotion labels
+emotion_dict = {0: "Angry", 1: "Disgust", 2: "Fear", 3: "Happy", 4: "Sad", 5: "Surprise", 6: "Neutral"}
+
+# Load the Haar Cascade for face detection
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+# Function to predict emotion
+def predict_emotion(frame):
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+    resized = cv2.resize(gray, (48, 48))  # Resize to the target size
+    normalized = resized.astype('float32') / 255  # Normalize the image
+    img = np.expand_dims(normalized, axis=0)  # Add batch dimension
+    img = np.expand_dims(img, axis=-1)  # Add channel dimension
+
+    # Predict the class
+    prediction = model.predict(img)
+    class_index = np.argmax(prediction)
+    confidence = np.max(prediction)
+
+    return class_index, confidence
+
+# Initialize the webcam
+cap = cv2.VideoCapture(0)
+
+# Create a figure and axis for matplotlib
+fig, ax = plt.subplots()
+
+# Function to update the frame in real-time
+def update_frame(i):
+    ret, frame = cap.read()
+    if not ret:
+        print("Failed to grab frame.")
+        return
+
+    # Detect faces in the frame
+    faces = face_cascade.detectMultiScale(frame, scaleFactor=1.1, minNeighbors=5)
+
+    for (x, y, w, h) in faces:
+        # Draw rectangle around detected face
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+
+        # Extract face region for emotion prediction
+        face_roi = frame[y:y+h, x:x+w]
+        class_index, confidence = predict_emotion(face_roi)
+
+        # Set a threshold for confidence
+        if confidence > 0.3:
+            emotion = emotion_dict[class_index]
+            # Add emotion label and confidence score on the frame
+            cv2.putText(frame, f"{emotion} ({confidence:.2f})", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
+    # Convert the BGR frame to RGB for displaying with matplotlib
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    # Clear the axis and update with the new frame
+    ax.clear()
+    ax.imshow(frame_rgb)
+    ax.axis('off')  # Hide axis
+
+# Use FuncAnimation to continuously update the plot
+ani = FuncAnimation(fig, update_frame, interval=50)  # 50ms interval for real-time update
+
+# Show the plot window
+plt.show()
+
+# Release the capture when done
+cap.release()
