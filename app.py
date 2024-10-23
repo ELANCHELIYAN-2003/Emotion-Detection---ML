@@ -199,7 +199,7 @@ elif options == "Classification":
         st.text("Streaming webcam...")
 
     # Start capturing video
-        cap = cv2.VideoCapture(10)
+        cap = cv2.VideoCapture(9)
     
         frame_window = st.image([])
 
