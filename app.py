@@ -166,7 +166,7 @@ elif options == "Classification":
     from PIL import Image
 
 # Load your trained model
-    model = load_model('E:/SEM-5/LAB/ML Lab/proj/model.h5')
+    model = load_model('model.h5')
 
 # Define emotion labels
     emotion_dict = {0: "Angry", 1: "Disgust", 2: "Fear", 3: "Happy", 4: "Sad", 5: "Surprise", 6: "Neutral"}
